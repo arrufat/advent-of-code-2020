@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project("Advent of Code 2020" LANGUAGES CXX)
 
-set(CPACK_PACKAGE_NAME "advent-of-code-2020")
-set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "0")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-
 # Use C++ 20
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -37,22 +31,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
     endif()
 endif()
-
-macro(add_dlib_executable name)
-    add_executable(${name} src/${name}.cpp)
-    target_link_libraries(${name} PRIVATE dlib::dlib)
-    target_include_directories(${name} PRIVATE src)
-    target_compile_options(${name} PRIVATE -Wall -Wextra -pedantic -Wno-deprecated-copy)
-    install(TARGETS ${name} DESTINATION bin)
-endmacro()
-
-macro(add_dlib_library name)
-    add_library(${name} src/${name}.cpp)
-    target_link_libraries(${name} PRIVATE dlib::dlib)
-    target_include_directories(${name} PRIVATE src)
-    target_compile_options(${name} PRIVATE -Wall -Wextra -pedantic -Wno-deprecated-copy)
-    install(TARGETS ${name} DESTINATION lib)
-endmacro()
 
 macro(add_day number)
     add_executable(day-${number} src/day-${number}.cpp)
