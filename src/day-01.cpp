@@ -16,40 +16,50 @@ try
     std::unordered_map<int, int> ht;
     const int target = 2020;
     std::cout << expenses.size() << std::endl;
-    // part 1
-    for (size_t i = 0; const auto& expense : expenses)
-    {
-        int complement = target - expense;
-        if (ht.find(complement) != ht.end())
-        {
-            std::cout << "sum:  " << expenses[i] + expenses[ht.at(complement)] << std::endl;
-            std::cout << "prod: " << expenses[i] * expenses[ht.at(complement)] << std::endl;
-            break;
-        }
-        ht[expenses[i]] = i;
-        ++i;
-    }
-    // part 2
 
-    std::sort(expenses.begin(), expenses.end());
-    for (size_t i = 0; i < expenses.size() - 2; ++i)
-    {
-        int l = i + 1;
-        int r = expenses.size() - 1;
-        while (l < r)
+    auto part1 = [&]() {
+        std::cout << "Part 1\n";
+        for (size_t i = 0; const auto& expense : expenses)
         {
-            if (expenses[i] + expenses[l] + expenses[r] == target)
+            int complement = target - expense;
+            if (ht.find(complement) != ht.end())
             {
-                std::cout << "sum:  " << expenses[i] + expenses[l] + expenses[r] << std::endl;
-                std::cout << "prod: " << expenses[i] * expenses[l] * expenses[r] << std::endl;
-                return 0;
+                std::cout << "sum:  " << expenses[i] + expenses[ht.at(complement)] << std::endl;
+                std::cout << "prod: " << expenses[i] * expenses[ht.at(complement)] << std::endl;
+                break;
             }
-            else if (expenses[i] + expenses[l] + expenses[r] < target)
-                ++l;
-            else
-                --r;
+            ht[expenses[i]] = i;
+            ++i;
         }
-    }
+    };
+
+
+    auto part2 = [&]() {
+        std::cout << "Part 2\n";
+        std::sort(expenses.begin(), expenses.end());
+        for (size_t i = 0; i < expenses.size() - 2; ++i)
+        {
+            int l = i + 1;
+            int r = expenses.size() - 1;
+            while (l < r)
+            {
+                if (expenses[i] + expenses[l] + expenses[r] == target)
+                {
+                    std::cout << "sum:  " << expenses[i] + expenses[l] + expenses[r] << std::endl;
+                    std::cout << "prod: " << expenses[i] * expenses[l] * expenses[r] << std::endl;
+                    return true;
+                }
+                else if (expenses[i] + expenses[l] + expenses[r] < target)
+                    ++l;
+                else
+                    --r;
+            }
+        }
+        return false;
+    };
+
+    part1();
+    part2();
 
     return EXIT_SUCCESS;
 }
