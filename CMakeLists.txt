@@ -38,3 +38,4 @@ endmacro()
 
 add_day(01)
 add_day(02)
+add_day(03)
