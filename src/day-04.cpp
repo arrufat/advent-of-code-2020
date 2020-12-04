@@ -120,7 +120,7 @@ try
         {
             --valid_passports;
         }
-        else // part 2
+        else  // part 2
         {
             if (not p.check_byr())
                 --valid_passports;
