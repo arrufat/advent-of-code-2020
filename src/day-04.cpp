@@ -22,6 +22,62 @@ try
         std::string ecl{};
         std::string pid{};
         std::string cid{};
+
+        auto check_fields() const -> bool
+        {
+            if (byr == -1 or iyr == -1 or eyr == -1 or hgt.empty() or ecl.empty() or hcl.empty() or
+                pid.empty())
+                return false;
+            return true;
+        }
+        auto check_byr() const -> bool { return check_range(byr, 1920, 2002); }
+        auto check_iyr() const -> bool { return check_range(iyr, 2010, 2020); }
+        auto check_eyr() const -> bool { return check_range(eyr, 2020, 2030); }
+        auto check_hgt() const -> bool
+        {
+            std::stringstream sin(hgt);
+            std::string unit;
+            int val;
+            sin >> std::ws >> val >> unit;
+            if (unit != "in" and unit != "cm")
+                return false;
+            if (unit == "cm" and (not check_range(val, 150, 193)))
+                return false;
+            if (unit == "in" and (not check_range(val, 59, 76)))
+                return false;
+            return true;
+        }
+        auto check_hcl() const -> bool
+        {
+            if (hcl[0] != '#' and hcl.length() != 7)
+                return false;
+            return std::any_of(hcl.begin() + 1, hcl.end(), [](char c) {
+                return ((c >= '0' and c <= '9') or (c >= 'a' and c <= 'f'));
+            });
+        }
+        auto check_ecl() const -> bool
+        {
+            const std::vector<std::string> colors{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+            if (std::find(colors.begin(), colors.end(), ecl) == colors.end())
+                return false;
+            return true;
+        }
+        auto check_pid() const -> bool
+        {
+            if (pid.length() != 9)
+                return false;
+            return std::none_of(pid.begin(), pid.end(), [](char c) {
+                return (c < '0' or c > '9');
+            });
+        }
+
+        private:
+        auto check_range(const int val, const int min, const int max) const -> bool
+        {
+            if (val < min or val > max)
+                return false;
+            return true;
+        }
     };
 
     std::vector<passport> passports(1);
@@ -57,93 +113,29 @@ try
             passports.push_back(passport());
         }
     }
-    std::cout << passports.size() << std::endl;
     int valid_passports = passports.size();
     for (const auto& p : passports)
     {
-        if (p.byr == -1 or p.iyr == -1 or p.eyr == -1 or p.hgt.empty() or p.ecl.empty() or
-            p.hcl.empty() or p.pid.empty())
+        if (not p.check_fields())
         {
             --valid_passports;
         }
-        else
+        else // part 2
         {
-            if (p.byr < 1920 or p.byr > 2002)
-            {
+            if (not p.check_byr())
                 --valid_passports;
-                continue;
-            }
-            if (p.iyr < 2010 or p.iyr > 2020)
-            {
+            else if (not p.check_iyr())
                 --valid_passports;
-                continue;
-            }
-            if (p.eyr < 2020 or p.eyr > 2030)
-            {
+            else if (not p.check_eyr())
                 --valid_passports;
-                continue;
-            }
-            // check height
-            std::stringstream sin(p.hgt);
-            std::string unit;
-            int val;
-            sin >> std::ws >> val >> unit;
-            if (unit != "in" and unit != "cm")
-            {
+            else if (not p.check_hgt())
                 --valid_passports;
-                continue;
-            }
-            if (unit == "cm" and (val < 150 or val > 193))
-            {
+            else if (not p.check_hcl())
                 --valid_passports;
-                continue;
-            }
-            if (unit == "in" and (val < 59 or val > 76))
-            {
+            else if (not p.check_ecl())
                 --valid_passports;
-                continue;
-            }
-            // check hair color
-            if (p.hcl[0] != '#' and p.hcl.length() != 7)
-            {
+            else if (not p.check_pid())
                 --valid_passports;
-                continue;
-            }
-            if (std::all_of(p.hcl.begin() + 1, p.hcl.end(), [](char c) {
-                if ((c >= '0' and c <= '9') or (c >= 'a' and c <= 'f'))
-                    return false;
-                else
-                    return true;
-                }))
-            {
-                --valid_passports;
-                continue;
-            }
-
-            // check eye color
-            const std::vector<std::string> colors{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
-            if (std::find(colors.begin(), colors.end(), p.ecl) == colors.end())
-            {
-                --valid_passports;
-                continue;
-            }
-
-            // check pid
-            if (p.pid.length() != 9)
-            {
-                --valid_passports;
-                continue;
-            }
-            if (std::all_of(p.pid.begin(), p.pid.end(), [](char c) {
-                    if (c >= '0' and c <= '9')
-                        return false;
-                    else
-                        return true;
-                }))
-            {
-                --valid_passports;
-                continue;
-            }
         }
     }
     std::cout << "num valid passports: " << valid_passports << std::endl;
