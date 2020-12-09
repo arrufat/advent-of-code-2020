@@ -57,18 +57,14 @@ try
                 size_t j = 0;
                 do
                 {
-                    sum -= input[j];
-                    ++j;
+                    sum -= input[j++];
                 } while (sum > target);
+
                 if (sum == target)
                 {
                     const auto [min, max] =
                         std::minmax_element(input.begin() + j, input.begin() + i + 1);
                     return *min + *max;
-                }
-                else
-                {
-                    continue;
                 }
             }
         }
