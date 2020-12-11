@@ -85,6 +85,23 @@ template <typename function> auto step(
     return changed;
 }
 
+template <typename function>
+auto solve(const std::vector<std::string>& input, const int threshold, function policy)
+{
+    auto prev_state = input;
+    auto next_state = prev_state;
+    bool changed = false;
+    do
+    {
+        changed = step(prev_state, next_state, threshold, policy);
+        prev_state = next_state;
+    } while (changed);
+    size_t num_seats = 0;
+    for (const auto& r : prev_state)
+        num_seats += occupied(r);
+    return num_seats;
+}
+
 auto main([[maybe_unused]] const int argc, [[maybe_unused]] const char** argv) -> int
 try
 {
@@ -93,44 +110,8 @@ try
     for (std::string line; std::getline(fin, line);)
         input.push_back(line);
 
-    const auto print_state = [](const std::vector<std::string>& seats) {
-        for (const auto& row : seats)
-            std::cout << row << '\n';
-    };
-
-    auto prev_state = input;
-    auto next_state = input;
-
-    const auto part1 = [&]() {
-        bool changed = false;
-        do
-        {
-            changed = step(prev_state, next_state, 4, adjacent);
-            prev_state = next_state;
-        } while (changed);
-        size_t num_seats = 0;
-        for (const auto& r : prev_state)
-            num_seats += occupied(r);
-        return num_seats;
-    };
-
-    const auto part2 = [&]() {
-        bool changed = false;
-        do
-        {
-            changed = step(prev_state, next_state, 5, visible);
-            prev_state = next_state;
-        } while (changed);
-        size_t num_seats = 0;
-        for (const auto& r : prev_state)
-            num_seats += occupied(r);
-        return num_seats;
-    };
-
-    prev_state = input;
-    std::cout << "part1: " << part1() << std::endl;
-    prev_state = input;
-    std::cout << "part1: " << part2() << std::endl;
+    std::cout << "part1: " << solve(input, 4, adjacent) << std::endl;
+    std::cout << "part1: " << solve(input, 5, visible) << std::endl;
 
     return EXIT_SUCCESS;
 }
