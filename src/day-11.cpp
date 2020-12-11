@@ -56,6 +56,35 @@ auto occupied(const std::string& s)
     return std::count(s.begin(), s.end(), '#');
 }
 
+template <typename function> auto step(
+    const std::vector<std::string>& prev_state,
+    std::vector<std::string>& next_state,
+    const int threshold,
+    function policy) -> bool
+{
+    const auto nr = prev_state.size();
+    const auto nc = prev_state[0].size();
+    bool changed = false;
+    for (size_t r = 0; r < nr; ++r)
+    {
+        for (size_t c = 0; c < nc; ++c)
+        {
+            const auto occ = occupied(policy(prev_state, r, c));
+            if (prev_state[r][c] == 'L' and occ == 0)
+            {
+                next_state[r][c] = '#';
+                changed = true;
+            }
+            else if (prev_state[r][c] == '#' and occ >= threshold)
+            {
+                next_state[r][c] = 'L';
+                changed = true;
+            }
+        }
+    }
+    return changed;
+}
+
 auto main([[maybe_unused]] const int argc, [[maybe_unused]] const char** argv) -> int
 try
 {
@@ -63,19 +92,6 @@ try
     std::vector<std::string> input;
     for (std::string line; std::getline(fin, line);)
         input.push_back(line);
-
-    // input = {
-    //     "L.LL.LL.LL",
-    //     "LLLLLLL.LL",
-    //     "L.L.L..L..",
-    //     "LLLL.LL.LL",
-    //     "L.LL.LL.LL",
-    //     "L.LLLLL.LL",
-    //     "..L.L.....",
-    //     "LLLLLLLLLL",
-    //     "L.LLLLLL.L",
-    //     "L.LLLLL.LL",
-    // };
 
     const auto print_state = [](const std::vector<std::string>& seats) {
         for (const auto& row : seats)
@@ -85,35 +101,11 @@ try
     auto prev_state = input;
     auto next_state = input;
 
-    const auto step1 = [&]() {
-        const auto nr = prev_state.size();
-        const auto nc = prev_state[0].size();
-        bool changed = false;
-        for (size_t r = 0; r < nr; ++r)
-        {
-            for (size_t c = 0; c < nc; ++c)
-            {
-                const auto occ = occupied(adjacent(prev_state, r, c));
-                if (prev_state[r][c] == 'L' and occ == 0)
-                {
-                    next_state[r][c] = '#';
-                    changed = true;
-                }
-                else if (prev_state[r][c] == '#' and occ >= 4)
-                {
-                    next_state[r][c] = 'L';
-                    changed = true;
-                }
-            }
-        }
-        return changed;
-    };
-
     const auto part1 = [&]() {
         bool changed = false;
         do
         {
-            changed = step1();
+            changed = step(prev_state, next_state, 4, adjacent);
             prev_state = next_state;
         } while (changed);
         size_t num_seats = 0;
@@ -122,35 +114,11 @@ try
         return num_seats;
     };
 
-    const auto step2 = [&]() {
-        const auto nr = prev_state.size();
-        const auto nc = prev_state[0].size();
-        bool changed = false;
-        for (size_t r = 0; r < nr; ++r)
-        {
-            for (size_t c = 0; c < nc; ++c)
-            {
-                const auto occ = occupied(visible(prev_state, r, c));
-                if (prev_state[r][c] == 'L' and occ == 0)
-                {
-                    next_state[r][c] = '#';
-                    changed = true;
-                }
-                else if (prev_state[r][c] == '#' and occ >= 5)
-                {
-                    next_state[r][c] = 'L';
-                    changed = true;
-                }
-            }
-        }
-        return changed;
-    };
-
     const auto part2 = [&]() {
         bool changed = false;
         do
         {
-            changed = step2();
+            changed = step(prev_state, next_state, 5, visible);
             prev_state = next_state;
         } while (changed);
         size_t num_seats = 0;
